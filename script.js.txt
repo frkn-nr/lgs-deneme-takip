@@ -1,0 +1,91 @@
+// Oturum ve Mola Saatleri Tanımlamaları (Saatler HH:MM formatında)
+const sessions = [
+    { name: "Sözel Oturum", start: "08:55", end: "10:10" },
+    { name: "MOLA", start: "10:10", end: "10:30" },
+    { name: "Sayısal Oturum", start: "10:30", end: "11:50" }
+];
+
+// DOM Elementlerini Seçme
+const liveTimeElement = document.getElementById('live-time');
+const currentStatusElement = document.getElementById('current-status');
+const remainingTimeElement = document.getElementById('remaining-time');
+const remainingTimeLabel = document.getElementById('remaining-time-label');
+
+// Saati HH:MM:SS formatında biçimlendiren fonksiyon
+function formatTime(date) {
+    const h = String(date.getHours()).padStart(2, '0');
+    const m = String(date.getMinutes()).padStart(2, '0');
+    const s = String(date.getSeconds()).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+}
+
+// Dakikayı HH:MM:SS formatına dönüştüren fonksiyon
+function formatRemainingTime(milliseconds) {
+    if (milliseconds < 0) return "Süreniz Bitti!";
+    
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    
+    // Yalnızca saat ve dakikayı göstermek daha uygun olabilir
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+// Ana Güncelleme Fonksiyonu
+function updateClockAndStatus() {
+    const now = new Date();
+    liveTimeElement.textContent = formatTime(now); // Canlı Saati Güncelle
+
+    let currentSession = null;
+    let nextSessionStartTime = null;
+
+    // Oturumları Kontrol Et
+    for (const session of sessions) {
+        // Oturum Başlangıç ve Bitiş Saatlerini Oluştur
+        const startParts = session.start.split(':');
+        const endParts = session.end.split(':');
+        
+        // Bu örnek için Yıl/Ay/Gün sabit kalmalı, sadece saatler değişmeli
+        const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(startParts[0]), parseInt(startParts[1]), 0);
+        const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(endParts[0]), parseInt(endParts[1]), 0);
+
+        if (now >= startTime && now < endTime) {
+            // Aktif Oturum Bulundu
+            currentSession = session;
+            remainingTimeElement.textContent = formatRemainingTime(endTime.getTime() - now.getTime());
+            break; 
+        } else if (now < startTime && !nextSessionStartTime) {
+            // Henüz Başlamamış En Yakın Oturumu Bul
+            nextSessionStartTime = startTime;
+        }
+    }
+
+    // Duruma Göre Ekranda Göster
+    if (currentSession) {
+        currentStatusElement.textContent = `${currentSession.name} Devam Ediyor`;
+        remainingTimeLabel.textContent = `${currentSession.name} Bitişine Kalan Süre:`;
+        remainingTimeElement.style.color = currentSession.name === "MOLA" ? "#1e88e5" : "#d32f2f"; // Mola süresi mavi olabilir
+    } else if (now < new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 55, 0)) { // 08:55'ten önce
+        currentStatusElement.textContent = "Sınav Başlangıcını Bekliyor";
+        remainingTimeLabel.textContent = "Başlangıca Kalan Süre:";
+        remainingTimeElement.textContent = formatRemainingTime(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 55, 0).getTime() - now.getTime());
+        remainingTimeElement.style.color = "#4caf50"; // Yeşil renk
+    } else if (now >= new Date(now.getFullYear(), now.getMonth(), now.getDate(), 11, 50, 0)) { // 11:50'den sonra
+        currentStatusElement.textContent = "Sınav Tamamlandı!";
+        remainingTimeLabel.textContent = "Güncel Saat:";
+        remainingTimeElement.textContent = formatTime(now);
+        remainingTimeElement.style.color = "#004d99"; 
+    } else if (nextSessionStartTime) {
+        currentStatusElement.textContent = "Oturumlar Arası Geçiş"; // Sadece 08:55'ten sonra ve oturum dışındaysa
+        remainingTimeLabel.textContent = "Bir Sonraki Oturuma Kalan Süre:";
+        remainingTimeElement.textContent = formatRemainingTime(nextSessionStartTime.getTime() - now.getTime());
+        remainingTimeElement.style.color = "#4caf50";
+    }
+}
+
+// Her saniye güncelleme fonksiyonunu çağır
+setInterval(updateClockAndStatus, 1000);
+
+// Sayfa yüklendiğinde bir kez çalıştır
+updateClockAndStatus();

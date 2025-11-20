@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LGS Deneme Sınavı Takip</title>
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+
+    <header>
+        <h1>LGS Deneme Sınavı Akışı</h1>
+        <p>8. Sınıf Öğrencileri İçin Deneme Sınavı Saatleri</p>
+    </header>
+
+    <div class="container">
+        <div class="column session-info">
+            <h2>📚 Sınav Oturumları</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Oturum</th>
+                        <th>Başlangıç</th>
+                        <th>Bitiş</th>
+                        <th>Süre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>**Sözel Oturum**</td>
+                        <td>08:55</td>
+                        <td>10:10</td>
+                        <td>75 dk</td>
+                    </tr>
+                    <tr>
+                        <td class="break-time">**MOLA**</td>
+                        <td class="break-time">10:10</td>
+                        <td class="break-time">10:30</td>
+                        <td class="break-time">20 dk</td>
+                    </tr>
+                    <tr>
+                        <td>**Sayısal Oturum**</td>
+                        <td>10:30</td>
+                        <td>11:50</td>
+                        <td>80 dk</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="note-box">
+                <p>**🔔 Önemli:** Sınav 11:50'de sona erecektir. Başarılar!</p>
+            </div>
+        </div>
+
+        <div class="column live-clock">
+            <h2>⏱️ Anlık Durum</h2>
+            <div id="current-status-box">
+                <p id="current-status">Sınav Başlamadı</p>
+                <div id="live-time">00:00:00</div>
+                <p id="remaining-time-label">Kalan Süre:</p>
+                <div id="remaining-time">--:--</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script> </body>
+</html>
